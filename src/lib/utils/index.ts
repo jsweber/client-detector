@@ -156,3 +156,7 @@ export const getOSInfo = (): {name: string, version: string} => {
 
     return osInfo;
 }
+
+export const isWeChart = () => {
+    return /MicroMessenger/i.test(window.navigator.userAgent);
+}

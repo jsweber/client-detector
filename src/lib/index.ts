@@ -1,4 +1,4 @@
-import { collect, ICollectData } from './api';
+import { collect } from './api';
 import { EventNameEnums } from './enums';
 import {
     createTimestamp,
@@ -7,19 +7,18 @@ import {
     getOSInfo,
     getScreenSize,
     getWindowSize,
-    isMobile
+    isMobile,
+    isWeChart
 } from './utils';
 
 export interface IClientDetector {
-    collectApi: string;
     userId?: string;
     send: () => Promise<any>;
     setUserId: (userId: string) => any;
 }
 
 export interface ClientDetectorGlobalParam {
-    collectApi: string;
-    serviceName: string;
+    serviceName: string; // 
     userId?: string;
     buryId?: string;
 }
@@ -42,7 +41,7 @@ export const createCollectInfo = <T>({
     const param = {
         buryId,
         serviceName,
-        eventName:`${serviceName}_${eventName}`,
+        eventName:`fe_bury_sdk_${eventName}`,
         eventTimestamp: timestamp,
         operatorUid: userId,
         operatedObjInfo: {
@@ -66,29 +65,31 @@ export interface DeviceInfo {
     userAgent: string;
     platform: string;
     language: string;
+    isWeChart: boolean;
 }
 
-export const createClientDetector = (param: ClientDetectorGlobalParam) => {
+export const DefaultUserId = 'visitor';
+
+export const createClientDetector = (serviceHost: string, param: ClientDetectorGlobalParam) => {
     const {
-        collectApi,
         serviceName,
         userId,
         buryId
     } = param;
 
     const ClientDetector = {
-        collectApi,
         userId,
+        serviceHost,
         async send<T = any>(eventName: string, data: T) {
             try {
                 const param = createCollectInfo({
                     serviceName,
                     eventName,
-                    userId: userId || this.userId,
+                    userId: this.userId || DefaultUserId,
                     buryId,
                     data
                 });
-                await collect<T>(this.collectApi, param);
+                await collect<T>(this.serviceHost, param);
             } catch(err) {
                 console.warn('[ClientDetector warn]', err);
             }
@@ -113,7 +114,8 @@ export const createClientDetector = (param: ClientDetectorGlobalParam) => {
                     windowSizeHeight: windowSize.height,
                     userAgent: navigator.userAgent.toLowerCase(),
                     platform: navigator.platform,
-                    language: navigator.language
+                    language: navigator.language,
+                    isWeChart: isWeChart()
                 }
                 this.send<DeviceInfo>(EventNameEnums.collectClientInfo, info);
             }catch (err) {

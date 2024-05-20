@@ -31,5 +31,19 @@ export default defineConfig({
       outDir: ['dist/types'],
       include: ['src/**/*.tsx', 'src/**/*.ts']
     })
-  ]
+  ],
+  server: {
+    host: true,
+    proxy: {
+      '/api/v1': {
+          target: 'http://127.0.0.1:10019',
+          changeOrigin: true,
+          secure: false,
+          rewrite: path => {
+              console.log(path);
+              return path.replace('^', '');
+          },
+      }
+    }
+  },
 })
