@@ -18,10 +18,9 @@ export const collect = async <T>(serviceHost: string, collectParam: ICollectData
         operatedObjInfo
     } = collectParam;
     const operatedObjInfoString = encodeURI(JSON.stringify(operatedObjInfo));
-    const url = `${serviceHost}/api/v1/bury/collect`.replace(/\/\//g, '/');
+    const url = `${serviceHost}/api/v1/bury/collect`;
     const query = `/${serviceName}/${eventName}/${eventTimestamp}?buryId=${buryId}&operatorUid=${operatorUid}&operatedObjInfo=${operatedObjInfoString}`;
     const fullURL = url + query;
-
     const image = new Image();
     image.src = fullURL;
 }
