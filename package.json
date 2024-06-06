@@ -1,12 +1,17 @@
 {
   "name": "@easycode/client-detector",
-  "version": "1.0.8",
+  "version": "1.0.9",
+  "author": "jsweber",
   "type": "module",
   "files": [
     "dist",
     "README.md",
     "LICENSE"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jsweber/client-detector"
+  },
   "main": "dist/client-detector.umd.js",
   "module": "dist/client-detector.js",
   "types": "dist/types/lib",

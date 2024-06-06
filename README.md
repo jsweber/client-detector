@@ -59,6 +59,10 @@
         <td>platform</td>
         <td>浏览器的navigator.platform</td>
     </tr>
+    <tr>
+        <td>gpu</td>
+        <td>gpu信息（ANGLE (NVIDIA Corporation, GeForce GTX 1660 Ti/PCIe/SSE2, OpenGL 4.5.0)）</td>
+    </tr>
 </table>
 <br/>
 
