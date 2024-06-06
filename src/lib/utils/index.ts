@@ -1,3 +1,5 @@
+export const DefaultText = 'Unknown';
+
 export const createTimestamp = (): string => {
     return Date.now() + '';
 }
@@ -27,7 +29,7 @@ export const getBrowserVersion = (): string => {
     if (Sys.chrome) return ('Chrome: ' + Sys.chrome); 
     if (Sys.opera) return ('Opera: ' + Sys.opera); 
     if (Sys.safari) return ('Safari: ' + Sys.safari);
-    return 'Unkonwn';
+    return DefaultText; //1.0.8版本以前有问题，搜集的是Unkonwn
 }
 
 export const getBrowserName = (): string => {
@@ -54,7 +56,7 @@ export const getBrowserName = (): string => {
         return 'IE>=11';
     }
     else{
-        return 'Unkonwn';
+        return DefaultText; //1.0.8版本以前有问题，搜集的是Unkonwn
     }
 }
 
@@ -106,7 +108,7 @@ export const isMobile = (): boolean => {
 
 export const getOSInfo = (): {name: string, version: string} => {
     const userAgent = navigator.userAgent;  
-    const osInfo = { name: 'Unknown', version: 'Unknown' };  
+    const osInfo = { name: DefaultText, version: DefaultText };  
     
     if (/windows nt 10\.0/i.test(userAgent)) {  
         osInfo.name = 'Windows';  
@@ -159,4 +161,26 @@ export const getOSInfo = (): {name: string, version: string} => {
 
 export const isWeChart = () => {
     return /MicroMessenger/i.test(window.navigator.userAgent);
+}
+
+export const getGPU = (): string => {
+    let GPUInfo = DefaultText
+
+    try {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl');
+        if (gl) {
+            const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+            if (debugInfo) {
+                const gpuText: string = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+                if (gpuText) {
+                    GPUInfo = gpuText;
+                }
+            }
+        }
+    } catch (err: any) {
+        console.warn('[ClientDetector warn]', err);
+    } finally {
+        return GPUInfo;
+    }
 }

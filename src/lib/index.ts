@@ -8,7 +8,8 @@ import {
     getScreenSize,
     getWindowSize,
     isMobile,
-    isWeChart
+    isWeChart,
+    getGPU
 } from './utils';
 
 export interface IClientDetector {
@@ -66,6 +67,7 @@ export interface DeviceInfo {
     platform: string;
     language: string;
     isWeChart: boolean;
+    gpu: string;
 }
 
 export const DefaultUserId = 'visitor';
@@ -76,6 +78,8 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
         userId,
         buryId
     } = param;
+
+    console.log(param);
 
     const ClientDetector = {
         userId,
@@ -115,7 +119,8 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
                     userAgent: navigator.userAgent.toLowerCase(),
                     platform: navigator.platform,
                     language: navigator.language,
-                    isWeChart: isWeChart()
+                    isWeChart: isWeChart(),
+                    gpu: getGPU()
                 }
                 this.send<DeviceInfo>(EventNameEnums.collectClientInfo, info);
             }catch (err) {
