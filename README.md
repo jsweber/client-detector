@@ -154,9 +154,9 @@ const Demo: FC<NavigatorDemoProps> = () => {
 
 ```
 
-## 设置网略指纹
+## 设置网络指纹
 <div>version >= 1.1.0</div>
-<p>网略指纹指通过客户端信息分辨用户的技术，当app没有用户功能去区分使用者时，可以使用网略指纹，它会根据用户客户端信息生成一个hash值，帮助后台系统做区分。</p>
+<p>网络指纹指通过客户端信息分辨用户的技术，当app没有用户功能去区分使用者时，可以使用网络指纹，它会根据客户端信息生成一个hash值，帮助后台系统做区分。</p>
 
 ```js
 import { createClientDetector } from '@easycode/client-detector';
