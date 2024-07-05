@@ -87,7 +87,7 @@ import { createClientDetector } from '@easycode/client-detector';
 const serviceHost = 'https://demo.com/data-bury'; // 必填，服务请求地址
 const serviceName = 'test-service'; // 必填且唯一，找管理员查询
 const userId = 'visitor'; // 可选,用户id，默认是visitor
-const buryId = ''; // 选填，32位uuid，前端生成，不填则由后端生成
+const buryId = ''; // 可选，32位uuid，前端生成，不填则由后端生成
 
 
 const clientDetector = createClientDetector(serviceHost,{
@@ -115,17 +115,14 @@ const Demo: FC<NavigatorDemoProps> = () => {
 
 ## 设置UserId
 <div>在具体业务场景中我们发现userId并不一定能在初始化ClientDetector阶段获取，</div>
-<div>所以提供setUserId方法，开发者可以通过该方法设置userId，后面发送的所有埋点都会带上userId,</div>
-<div>注意!在调用setUserId前的埋点不会带有userid，使用默认值visitor</div>
+<div>所以提供setUserId方法，开发者可以通过该方法设置userId，设置后发送的所有埋点请求都会带上userId,</div>
+<div>注意! 在调用setUserId前的请求不会带有userid，使用默认值visitor</div>
 
 ```js
 import { createClientDetector } from '@easycode/client-detector';
 
 const serviceHost = 'https://demo.com/data-bury'; // 必填，服务请求地址
 const serviceName = 'test-service'; // 必填且唯一，找管理员查询
-const userId = 'visitor'; // 可选,用户id，默认是visitor
-const buryId = ''; // 选填，32位uuid，前端生成，不填则由后端生成
-
 
 const clientDetector = createClientDetector(serviceHost,{
     serviceName,
@@ -156,6 +153,65 @@ const Demo: FC<NavigatorDemoProps> = () => {
 };
 
 ```
+
+## 设置网略指纹
+<div>version >= 1.1.0</div>
+<p>网略指纹指通过客户端信息分辨用户的技术，当app没有用户功能去区分使用者时，可以使用网略指纹，它会根据用户客户端信息生成一个hash值，帮助后台系统做区分。</p>
+
+```js
+import { createClientDetector } from '@easycode/client-detector';
+
+const serviceHost = 'https://demo.com/data-bury'; // 必填，服务请求地址
+const serviceName = 'test-service'; // 必填且唯一，找管理员查询
+
+const clientDetector = createClientDetector(serviceHost,{
+    serviceNam
+});
+
+
+const Demo: FC<NavigatorDemoProps> = () => {
+    useEffect(() => {
+        // 发送客户端设备信息
+        // setFingerprint是一个异步方法，会在localstorage中缓存生成的网略指纹
+        detector.setFingerprint().then(() => detector.sendClientInfo());
+    }, []);
+
+    return (
+        <div className={ styles.navigatorDemo }>
+            Demo
+        </div>
+    );
+};
+
+```
+
+## 单独使用网络指纹
+<div>version >= 1.1.0</div>
+
+```js
+import { getFingerprint } from '@easycode/client-detector';
+
+
+const Demo: FC<NavigatorDemoProps> = () => {
+    useEffect(() => {
+        // getFingerprint是一个异步函数
+        const print = async () => {
+            const id = await getFingerprint();
+            console.log(id); // 输出一串hash: 801baad441a144716cb8e0a6181ca337
+        }
+
+        print();
+    }, []);
+
+    return (
+        <div className={ styles.navigatorDemo }>
+            Demo
+        </div>
+    );
+};
+
+```
+
 # 开发
 
 ```sh

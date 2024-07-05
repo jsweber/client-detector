@@ -1,3 +1,4 @@
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { collect } from './api';
 import { EventNameEnums } from './enums';
 import {
@@ -72,20 +73,45 @@ export interface DeviceInfo {
 
 export const DefaultUserId = 'visitor';
 
+export const getFingerprint = async (): Promise<string> => {
+    let id = DefaultUserId;
+    try {
+        const fpPromise = FingerprintJS.load();
+        const fp = await fpPromise;
+        const result = await fp.get();
+        id = result.visitorId;
+    } catch(err){
+        console.warn('[ClientDetector warn]', err);
+    }finally {
+        return id;
+    }
+}
+
+export const getCachedUserId = async (): Promise<string> => {
+    const localKey = '__client_detector_local_key__';
+    let id = localStorage.getItem(localKey);
+
+    if (!id) {
+        id = await getFingerprint();
+        localStorage.setItem(localKey, id);
+    }
+
+    return id;
+}
+
 export const createClientDetector = (serviceHost: string, param: ClientDetectorGlobalParam) => {
     const {
         serviceName,
         userId,
-        buryId
+        buryId,
     } = param;
-
-    console.log(param);
 
     const ClientDetector = {
         userId,
         serviceHost,
         async send<T = any>(eventName: string, data: T) {
             try {
+                console.log(this.userId);
                 const param = createCollectInfo({
                     serviceName,
                     eventName,
@@ -100,6 +126,12 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
         },
         setUserId(userId: string) {
             this.userId = userId;
+        },
+        async setFingerprint() {
+            const id = await getCachedUserId();
+            console.log(id);
+            this.userId = id;
+            console.log(this.userId);
         },
         async sendClientInfo() {
             try{
