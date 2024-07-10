@@ -71,6 +71,13 @@ export interface DeviceInfo {
     gpu: string;
 }
 
+export type ErrorInfo = DeviceInfo | {
+    errorName: string;
+    errorMessage: string;
+    errorStack: string;
+    errorComponentStack: string;
+}
+
 export const DefaultUserId = 'visitor';
 
 export const getFingerprint = async (): Promise<string> => {
@@ -99,6 +106,30 @@ export const getCachedUserId = async (): Promise<string> => {
     return id;
 }
 
+const getClientInfo = (): DeviceInfo => {
+    const {name: os, version: osVersion} = getOSInfo();
+    const screenSize = getScreenSize();
+    const windowSize = getWindowSize();
+    const info = {
+        os,
+        osVersion,
+        browserName: getBrowserName(),
+        browserVersion: getBrowserVersion(),
+        isMobile: isMobile(),
+        screenSizeWidth: screenSize.width,
+        screenSizeHeight: screenSize.height,
+        windowSizeWidth: windowSize.width,
+        windowSizeHeight: windowSize.height,
+        userAgent: navigator.userAgent.toLowerCase(),
+        platform: navigator.platform,
+        language: navigator.language,
+        isWeChart: isWeChart(),
+        gpu: getGPU()
+    }
+
+    return info;
+}
+
 export const createClientDetector = (serviceHost: string, param: ClientDetectorGlobalParam) => {
     const {
         serviceName,
@@ -111,7 +142,6 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
         serviceHost,
         async send<T = any>(eventName: string, data: T) {
             try {
-                console.log(this.userId);
                 const param = createCollectInfo({
                     serviceName,
                     eventName,
@@ -129,36 +159,35 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
         },
         async setFingerprint() {
             const id = await getCachedUserId();
-            console.log(id);
             this.userId = id;
-            console.log(this.userId);
         },
         async sendClientInfo() {
             try{
-                const {name: os, version: osVersion} = getOSInfo();
-                const screenSize = getScreenSize();
-                const windowSize = getWindowSize();
-                const info = {
-                    os,
-                    osVersion,
-                    browserName: getBrowserName(),
-                    browserVersion: getBrowserVersion(),
-                    isMobile: isMobile(),
-                    screenSizeWidth: screenSize.width,
-                    screenSizeHeight: screenSize.height,
-                    windowSizeWidth: windowSize.width,
-                    windowSizeHeight: windowSize.height,
-                    userAgent: navigator.userAgent.toLowerCase(),
-                    platform: navigator.platform,
-                    language: navigator.language,
-                    isWeChart: isWeChart(),
-                    gpu: getGPU()
-                }
+                const info = getClientInfo();
                 this.send<DeviceInfo>(EventNameEnums.collectClientInfo, info);
             }catch (err) {
                 console.warn('[ClientDetector warn]', err);
             }
-        }
+        },
+        /**
+         * 
+         * @param error javascript error instance
+         * @param errorComponentStack if you are using react or vue, you pass it.
+         */
+        async sendError(error: Error, errorComponentStack: string = '') {
+            try{
+                const info = {
+                    ...getClientInfo(),
+                    errorName: error.name,
+                    errorMessage: error.message,
+                    errorStack: error.stack || '',
+                    errorComponentStack
+                };
+                this.send<ErrorInfo>(EventNameEnums.collectErrorInfo, info);
+            }catch (err) {
+                console.warn('[ClientDetector warn]', err);
+            }
+        },
     }
 
     return ClientDetector;

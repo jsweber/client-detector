@@ -1,7 +1,8 @@
 # 介绍
 <div>
-前端埋点sdk，开发者利用该sdk可以去搜集设备信息、错误日志(开发中)和性能数据(开发中)等。
+前端埋点sdk，开发者利用该sdk可以去搜集设备信息、错误日志和性能数据(开发中)等。
 </div>
+<br/><br/>
 
 # 功能
 ## 设备信息搜集
@@ -67,10 +68,33 @@
 <br/>
 
 ## 错误日志
-未完成<br/><br/>
+
+<div>为了方便确定发生错误的环境，错误信息会包括设备信息，</div>
+<div>在此基础上会增加错误相关字段，新增字段见下表</div>
+
+<table border>
+    <tr>
+        <td>errorName</td>
+        <td>错误名称（ 举例：TypeError, ParseError）</td>
+    </tr>
+    <tr>
+        <td>errorMessage</td>
+        <td>错误信息</td>
+    </tr>
+    <tr>
+        <td>errorStack</td>
+        <td>错误栈，依赖浏览器兼容性</td>
+    </tr>
+    <tr>
+        <td>errorComponentStack</td>
+        <td>组件级别错误栈，依赖前端框架实现，已知react支持</td>
+    </tr>
+</table>
+<br/>
+
 
 ## 性能数据
-未完成<br/><br/>
+todo<br/><br/>
 
 # 安装
 
@@ -114,7 +138,7 @@ const Demo: FC<NavigatorDemoProps> = () => {
 ```
 
 ## 设置UserId
-<div>在具体业务场景中我们发现userId并不一定能在初始化ClientDetector阶段获取，</div>
+<div>在具体业务场景中，我们发现userId并不一定能在初始化ClientDetector阶段获取，</div>
 <div>所以提供setUserId方法，开发者可以通过该方法设置userId，设置后发送的所有埋点请求都会带上userId,</div>
 <div>注意! 在调用setUserId前的请求不会带有userid，使用默认值visitor</div>
 
@@ -123,6 +147,8 @@ import { createClientDetector } from '@easycode/client-detector';
 
 const serviceHost = 'https://demo.com/data-bury'; // 必填，服务请求地址
 const serviceName = 'test-service'; // 必填且唯一，找管理员查询
+const userId = 'visitor'; // 用户id，可选
+const buryId = ''; // 可选
 
 const clientDetector = createClientDetector(serviceHost,{
     serviceName,
@@ -154,7 +180,7 @@ const Demo: FC<NavigatorDemoProps> = () => {
 
 ```
 
-## 设置网络指纹
+## 网络指纹
 <div>version >= 1.1.0</div>
 <p>网络指纹指通过客户端信息分辨用户的技术，当app没有用户功能去区分使用者时，可以使用网络指纹，它会根据客户端信息生成一个hash值，帮助后台系统做区分。</p>
 
@@ -165,7 +191,7 @@ const serviceHost = 'https://demo.com/data-bury'; // 必填，服务请求地址
 const serviceName = 'test-service'; // 必填且唯一，找管理员查询
 
 const clientDetector = createClientDetector(serviceHost,{
-    serviceNam
+    serviceName
 });
 
 
@@ -185,7 +211,7 @@ const Demo: FC<NavigatorDemoProps> = () => {
 
 ```
 
-## 单独使用网络指纹
+## 仅使用网络指纹
 <div>version >= 1.1.0</div>
 
 ```js
@@ -211,6 +237,150 @@ const Demo: FC<NavigatorDemoProps> = () => {
 };
 
 ```
+
+## 错误收集功能
+
+<div>version >= 1.2.0</div>
+<br/>
+
+<div><code>案例目录结构</code></div>
+
+```
+my-app
+...
+├── detector.tsx
+├── error-boundary.tsx
+├── error-demo.tsx
+├── app.tsx
+...
+```
+<br/><br/>
+
+<div><code>detector.tsx</code></div>
+
+```js
+import { createClientDetector } from '@easycode/client-detector';
+const serviceHost = 'https://host/burry/api'; // 服务请求地址
+const serviceName = 'test-service'; // 必须唯一，找管理员查询
+const userId = 'visitor'; // 用户id，可选
+const buryId = ''; // 可选
+
+export const clientDetector = createClientDetector(serviceHost,{
+    serviceName,
+    userId,
+    buryId
+});
+
+```
+<br/>
+
+<div><code>error-boundary.tsx</code> 捕获错误，通过client-detector发送错误</div>
+
+```js
+import { ReactNode, Component, ErrorInfo } from 'react';
+import { clientDetector } from './detector';
+
+export interface ErrorBoundaryProps {
+    children?: ReactNode;
+}
+
+export interface ErrorBoundaryState {
+    hasError: boolean;
+}
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+    constructor(props: ErrorBoundaryProps) {
+        super(props);
+        this.state = { hasError: false };
+    }
+
+    static getDerivedStateFromError(error: Error) {
+        // 更新 state 使下一次渲染能够显示降级后的 UI
+        return { hasError: true };
+    }
+
+    componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+        // 发送错误信息
+        // errorInfo是以组件为单位的调用栈
+        clientDetector.sendError(error, errorInfo.componentStack || '');
+    }
+
+    render() {
+        if (this.state.hasError) {
+        // 你可以自定义降级后的 UI 并渲染
+            return <h1>Something went wrong.</h1>;
+        }
+
+        return this.props.children; 
+    }
+}
+
+export default ErrorBoundary;
+
+
+```
+<br/>
+
+<div><code>error-demo.tsx</code></div>
+
+```js
+import { FC, ReactNode, useEffect } from 'react';
+
+export interface ErrorDemoProps {
+    children?: ReactNode;
+}
+
+const ErrorDemo: FC<ErrorDemoProps> = () => {
+
+    useEffect(() => {
+        throw new TypeError('error message');
+    }, []);
+
+    return (
+        <div>
+            ErrorDemo
+        </div>
+    );
+};
+
+export default ErrorDemo;
+
+
+```
+<br/>
+
+<div><code>app.tsx</code> 使用上述组件</div>
+
+```js
+import { FC, ReactNode, useEffect } from 'react';
+import { clientDetector } from './detector';
+import ErrorBoundary from './error-boundary';
+import ErrorDemo from './error-demo'
+
+export interface AppProps {
+    children?: ReactNode;
+}
+
+const App: FC<AppProps> = () => {
+    useEffect(() => {
+        // 发送设备信息
+        clientDetector.sendClientInfo();
+    }, []);
+
+    return (
+        <ErrorBoundary>
+            <div>
+                请求发送测试页面
+            </div>
+            <ErrorDemo />
+        </ErrorBoundary>
+    );
+};
+
+export default App;
+
+```
+<br/>
 
 # 开发
 
