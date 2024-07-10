@@ -254,7 +254,7 @@ my-app
 ├── app.tsx
 ...
 ```
-<br/><br/>
+<br/>
 
 <div><code>detector.tsx</code></div>
 
