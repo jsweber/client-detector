@@ -25,19 +25,19 @@ export default defineConfig({
     }
   },
   test: {
-        
+
   },
   plugins: [
     react(),
-    importToCDN({
-      modules: [
-        {
-            name: '@easycode/client-detector',
-            var: 'ClientDetector',
-            path: './dist/client-detector.umd.cjs'
-        },
-      ],
-    }),
+    // importToCDN({
+    //   modules: [
+    //     {
+    //         name: '@easycode/client-detector',
+    //         var: 'ClientDetector',
+    //         path: './dist/client-detector.umd.cjs'
+    //     },
+    //   ],
+    // }),
     dts({
       outDir: ['dist/types'],
       include: ['src/**/*.tsx', 'src/**/*.ts']
@@ -47,13 +47,13 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api/v1': {
-          target: 'http://127.0.0.1:10019',
-          changeOrigin: true,
-          secure: false,
-          rewrite: path => {
-              console.log(path);
-              return path.replace('^', '');
-          },
+        target: 'http://127.0.0.1:10019',
+        changeOrigin: true,
+        secure: false,
+        rewrite: path => {
+          console.log(path);
+          return path.replace('^', '');
+        },
       }
     }
   },
