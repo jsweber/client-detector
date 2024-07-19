@@ -1,4 +1,5 @@
 export const EventNameEnums = {
     collectClientInfo: 'collectClientInfo',
-    collectErrorInfo: 'collectErrorInfo'
+    collectErrorInfo: 'collectErrorInfo',
+    collectActionLogInfo: 'collectActionLogInfo'
 }

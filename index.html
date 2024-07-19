@@ -5,6 +5,46 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + React + TS</title>
+    <!-- <script src="/src/build/client-detector.umd.cjs"></script> -->
+    <!-- 初始化 client detector -->
+    <!-- <script>
+        (function(){
+            const serviceHost = 'https://openxlab.org.cn/gw/data-bury'; // 必填，服务请求地址
+            const serviceName = 'test-service'; // 必填且唯一，找管理员查询
+            ClientDetector.init(serviceHost, { serviceName: serviceName});
+
+            window.onload = function() {
+              const sc = document.getElementsByTagName('script');
+              const loadScript = function(script) {
+                console.log(script);
+                return new Promise(function(resolve, reject){
+                  // 监听加载成功事件  
+                  script.addEventListener('load', function() {  
+                    resolve('Script loaded successfully.');  
+                  });  
+                    
+                  // 监听加载失败事件  
+                  script.addEventListener('error', function() {  
+                    reject('Script failed to load.');  
+                  });
+                });
+              }
+              const pros = [].filter.call(sc, function(s) {
+                // 过滤掉内嵌script
+                return !!s.src.trim();
+              })
+              .map(function(s) {
+                return loadScript(s);
+              })
+
+              console.log(pros);
+
+              Promise.all(pros).then(function() {
+                console.log('ok');
+              })
+            }
+        })();
+    </script> -->
   </head>
   <body>
     <div id="root"></div>

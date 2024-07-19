@@ -23,7 +23,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
     componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         // errorInfo是以组件为单位的调用栈
-        clientDetector.sendError(error, errorInfo.componentStack || '');
+        clientDetector.sendError0(error, errorInfo.componentStack || '');
     }
 
     render() {

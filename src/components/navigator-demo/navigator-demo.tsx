@@ -1,5 +1,5 @@
 import { FC, ReactNode, useEffect } from 'react';
-import { clientDetector } from '../../detector';
+import { detector, log } from '../../lib';
 import ErrorBoundary from '../error-boundary';
 import ErrorDemo from '../error-demo'
 import styles from './navigator-demo.module.less';
@@ -11,16 +11,22 @@ export interface NavigatorDemoProps {
 const NavigatorDemo: FC<NavigatorDemoProps> = () => {
     useEffect(() => {
         // userId为visitor
-        clientDetector.sendClientInfo();
+        detector.sendClientInfo();
         return () => {
-            
+
         };
     }, []);
+
+    const handleClick = () => {
+        const key = log('handleclick', 12345, false);
+        console.log(key);
+    }
 
     return (
         <ErrorBoundary>
             <div className={styles.navigatorDemo}>
                 请求发送测试页面
+                <button onClick={handleClick}>点击</button>
             </div>
             <ErrorDemo />
         </ErrorBoundary>

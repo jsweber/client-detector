@@ -4,6 +4,14 @@
 </div>
 <br/><br/>
 
+# 兼容性
+<ul>
+    <li>Chrome >=87</li>
+    <li>Firefox >=78</li>
+    <li>Safari >=14</li>
+    <li>Edge >=88</li>
+</ul>
+
 # 功能
 ## 设备信息搜集
 <div>搜集信息如下</div>
@@ -81,6 +89,10 @@
         <td>errorMessage</td>
         <td>错误信息</td>
     </tr>
+     <tr>
+        <td>errorLevel</td>
+        <td>错误级别：0-3，一般来说数字越小越严重</td>
+    </tr>
     <tr>
         <td>errorStack</td>
         <td>错误栈，依赖浏览器兼容性</td>
@@ -98,9 +110,39 @@ todo<br/><br/>
 
 # 安装
 
+## npm安装
+
 ```sh
 npm install @easycode/client-detector
 ```
+
+## 浏览器引入
+
+<div>通过script标签引入cdn上的umd包</div>
+<div>copy以下代码放在script标签中，如下示例</div>
+<br/>
+
+```html
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client detector demo</title>
+    <!-- 引入client detector，暴露global对象: ClientDetector -->
+    <script src="/src/build/client-detector.umd.cjs"></script>
+    <!-- 初始化 client detector -->
+    <script>
+        (function(){
+            const serviceHost = 'https://demo.com/data-bury'; // 必填，服务请求地址
+            const serviceName = 'test-service'; // 必填且唯一，找管理员查询
+            ClientDetector.init(serviceHost, { serviceName: serviceName});
+        })();
+    </script>
+...
+
+```
+
+<br/>
 
 # 使用
 ## 上手
@@ -295,6 +337,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     }
 
     static getDerivedStateFromError(error: Error) {
+        console.log(error);
         // 更新 state 使下一次渲染能够显示降级后的 UI
         return { hasError: true };
     }
@@ -302,7 +345,8 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         // 发送错误信息
         // errorInfo是以组件为单位的调用栈
-        clientDetector.sendError(error, errorInfo.componentStack || '');
+        clientDetector.sendError0(error, errorInfo.componentStack || '');
+        // 等同于 clientDetector.sendError(error, errorInfo.componentStack || ''， 0);
     }
 
     render() {
