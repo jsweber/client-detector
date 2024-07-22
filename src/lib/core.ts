@@ -74,6 +74,7 @@ export interface DeviceInfo {
     // 1.3.0 add
     executeTimestamp: string;
     performanceNow: string;
+    location: string;
 }
 
 export type ErrorInfo = DeviceInfo | {
@@ -143,7 +144,8 @@ const getClientInfo = async (): Promise<DeviceInfo> => {
         printWater,
         // 1.3.0 add
         executeTimestamp: (Date.now()).toString(),
-        performanceNow: performanceNow.toString()
+        performanceNow: performanceNow.toString(),
+        location: window.location.href
     }
 
     return info;
