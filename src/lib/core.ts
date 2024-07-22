@@ -43,7 +43,7 @@ export const createCollectInfo = <T>({
     const param = {
         buryId,
         serviceName,
-        eventName:`fe_bury_sdk_${eventName}`,
+        eventName: `fe_bury_sdk_${eventName}`,
         eventTimestamp: timestamp,
         operatorUid: userId,
         operatedObjInfo: {
@@ -99,9 +99,9 @@ export const getFingerprint = async (): Promise<string> => {
         const fp = await fpPromise;
         const result = await fp.get();
         id = result.visitorId;
-    } catch(err){
+    } catch (err) {
         console.warn('[ClientDetector warn]', err);
-    }finally {
+    } finally {
         return id;
     }
 }
@@ -119,7 +119,7 @@ export const getCachedUserId = async (): Promise<string> => {
 }
 
 const getClientInfo = async (): Promise<DeviceInfo> => {
-    const {name: os, version: osVersion} = getOSInfo();
+    const { name: os, version: osVersion } = getOSInfo();
     const screenSize = getScreenSize();
     const windowSize = getWindowSize();
     const printWater = await getCachedUserId();
@@ -149,7 +149,7 @@ const getClientInfo = async (): Promise<DeviceInfo> => {
     return info;
 }
 
-type SendErrorType = (error: Error, errorComponentStack: string) => Promise<void>;
+type SendErrorType = (error: Error, errorComponentStack?: string) => Promise<void>;
 export interface Detector {
     userId: string | undefined;
     serviceHost: string;
@@ -196,7 +196,7 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
                     data
                 });
                 await collect<T>(ClientDetector.serviceHost, param);
-            } catch(err) {
+            } catch (err) {
                 console.warn('[ClientDetector warn]', err);
             }
         },
@@ -208,10 +208,10 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
             ClientDetector.userId = id;
         },
         async sendClientInfo() {
-            try{
+            try {
                 const info = await getClientInfo();
                 ClientDetector.send<DeviceInfo>(EventNameEnums.collectClientInfo, info);
-            }catch (err) {
+            } catch (err) {
                 console.warn('[ClientDetector warn]', err);
             }
         },
@@ -220,8 +220,8 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
          * @param error javascript error instance
          * @param errorComponentStack if you are using react or vue, you pass it.
          */
-        async sendError(error: Error, errorComponentStack: string = '', level: number = 2) {
-            try{
+        async sendError(error: Error, errorComponentStack = '', level = 2) {
+            try {
                 const clientInfo = await getClientInfo();
                 const info = {
                     ...clientInfo,
@@ -232,26 +232,26 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
                     errorComponentStack
                 };
                 ClientDetector.send<ErrorInfo>(EventNameEnums.collectErrorInfo, info);
-            }catch (err) {
+            } catch (err) {
                 console.warn('[ClientDetector warn]', err);
             }
         },
 
-        async sendError0(error: Error, errorComponentStack: string = '') {
+        async sendError0(error: Error, errorComponentStack = '') {
             ClientDetector.sendError(error, errorComponentStack, 0);
         },
-        async sendError1(error: Error, errorComponentStack: string = '') {
+        async sendError1(error: Error, errorComponentStack = '') {
             ClientDetector.sendError(error, errorComponentStack, 1);
         },
-        async sendError2(error: Error, errorComponentStack: string = '') {
+        async sendError2(error: Error, errorComponentStack = '') {
             ClientDetector.sendError(error, errorComponentStack, 2);
         },
-        async sendError3(error: Error, errorComponentStack: string = '') {
+        async sendError3(error: Error, errorComponentStack = '') {
             ClientDetector.sendError(error, errorComponentStack, 3);
         },
 
-        async sendAction (log: string, actionKey: string) {
-            try{
+        async sendAction(log: string, actionKey: string) {
+            try {
                 const clientInfo = await getClientInfo();
                 const info = {
                     ...clientInfo,
@@ -259,7 +259,7 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
                     actionKey
                 };
                 ClientDetector.send<ActionInfo>(EventNameEnums.collectActionLogInfo, info);
-            }catch (err) {
+            } catch (err) {
                 console.warn('[ClientDetector warn]', err);
             }
         }
@@ -272,7 +272,7 @@ export let detector: Detector = createClientDetector('', {
     serviceName: ''
 });
 
-export type ENVType = 'production' | 'development'; 
+export type ENVType = 'production' | 'development';
 
 export let ENV: ENVType = 'production';
 
@@ -295,12 +295,12 @@ export const sendActionLog = async (log: string, actionKey: string, isSend: bool
 
 export type logType = (message?: any, ...optionalParams: any[]) => string;
 
-export const log: logType =  (...args) => {
+export const log: logType = (...args) => {
     const actionKey = args.join('');
     if (ENV === 'production') {
         const strArgs = (args || []).join('\n ');
         sendActionLog(strArgs, actionKey);
     }
-    
+
     return actionKey;
 }

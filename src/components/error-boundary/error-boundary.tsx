@@ -24,15 +24,16 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         // errorInfo是以组件为单位的调用栈
         clientDetector.sendError0(error, errorInfo.componentStack || '');
+        clientDetector.sendError2(new Error('测试数据'));
     }
 
     render() {
         if (this.state.hasError) {
-        // 你可以自定义降级后的 UI 并渲染
+            // 你可以自定义降级后的 UI 并渲染
             return <h1>Something went wrong.</h1>;
         }
 
-        return this.props.children; 
+        return this.props.children;
     }
 }
 
