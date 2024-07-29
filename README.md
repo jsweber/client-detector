@@ -426,6 +426,68 @@ export default App;
 ```
 <br/>
 
+## 单例模式
+
+<div>version >= 1.3.0</div>
+<br/>
+
+<div>
+为了简化使用，client-detector提供单例模式，并且继续提供工厂模式（<code>createClientDetector</code>创建实例）的方式。<br/>
+</div>
+<br/>
+
+### 单例模式初始化
+
+<div>在入口文件<code>main.ts</code>中初始化</div>
+
+```js
+import * as ReactDOM from 'react-dom/client';
+import { init } from '@easycode/client-detector';
+import App from './app';
+
+const serviceHost = 'https://openxlab.org.cn/gw/data-bury'; // 必填，服务请求地址
+const serviceName = 'test-service'; // 必填且唯一，找管理员查询
+
+init(serviceHost, {
+    serviceName,
+});
+
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+    <App />,
+);
+```
+
+### 单例模式搜集设备信息
+
+```js
+import { detector } from '@easycode/client-detector';
+import { useEffect } from 'react';
+
+const App = () => {
+
+    useEffect(() => {
+        const init = async () => {
+            detector.sendClientInfo();
+        };
+
+        init();
+    }, []);
+
+    return (
+
+        <div>...</div>
+    );
+};
+
+export default App;
+
+```
+
+### 单例模式发送错误
+
+
+
+<br/>
 # 开发
 
 ```sh
