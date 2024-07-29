@@ -151,7 +151,7 @@ const getClientInfo = async (): Promise<DeviceInfo> => {
     return info;
 }
 
-type SendErrorType = (error: Error, errorComponentStack?: string) => Promise<void>;
+type SendErrorType = (error: Error | string, errorComponentStack?: string) => Promise<void>;
 export interface Detector {
     userId: string | undefined;
     serviceHost: string;
@@ -159,7 +159,7 @@ export interface Detector {
     setUserId: (userId: string) => void;
     setFingerprint: () => Promise<void>;
     sendClientInfo: () => Promise<void>;
-    sendError: (error: Error, errorComponentStack: string, level: number) => Promise<void>;
+    sendError: (error: Error | string, errorComponentStack: string, level: number) => Promise<void>;
     sendError0: SendErrorType;
     sendError1: SendErrorType;
     sendError2: SendErrorType;
@@ -222,8 +222,9 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
          * @param error javascript error instance
          * @param errorComponentStack if you are using react or vue, you pass it.
          */
-        async sendError(error: Error, errorComponentStack = '', level = 2) {
+        async sendError(err: Error | string, errorComponentStack = '', level = 2) {
             try {
+                const error = err instanceof Error ? err : (new Error(err));
                 const clientInfo = await getClientInfo();
                 const info = {
                     ...clientInfo,
@@ -239,16 +240,16 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
             }
         },
 
-        async sendError0(error: Error, errorComponentStack = '') {
+        async sendError0(error: Error | string, errorComponentStack = '') {
             ClientDetector.sendError(error, errorComponentStack, 0);
         },
-        async sendError1(error: Error, errorComponentStack = '') {
+        async sendError1(error: Error | string, errorComponentStack = '') {
             ClientDetector.sendError(error, errorComponentStack, 1);
         },
-        async sendError2(error: Error, errorComponentStack = '') {
+        async sendError2(error: Error | string, errorComponentStack = '') {
             ClientDetector.sendError(error, errorComponentStack, 2);
         },
-        async sendError3(error: Error, errorComponentStack = '') {
+        async sendError3(error: Error | string, errorComponentStack = '') {
             ClientDetector.sendError(error, errorComponentStack, 3);
         },
 
