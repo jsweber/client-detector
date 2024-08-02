@@ -8,7 +8,7 @@ export interface ErrorDemoProps {
 const ErrorDemo: FC<ErrorDemoProps> = () => {
 
     useEffect(() => {
-        // throw new TypeError('error message');
+        throw new TypeError('error message');
     }, []);
 
     return (

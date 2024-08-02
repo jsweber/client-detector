@@ -13,7 +13,7 @@ import {
     getGPU
 } from './utils';
 
-export type ENVType = 'production' | 'development';
+export type ENVType = 'production' | 'development' | true | false;
 
 export let ENV: ENVType = 'production';
 
@@ -183,7 +183,7 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
         userId,
         serviceHost,
         async send<T = any>(eventName: string, data: T) {
-            if (ENV === 'development') {
+            if ((typeof ENV === 'string' && ENV !== 'production') || (typeof ENV === 'boolean' && !ENV)) {
                 // console.log('[ClientDetector info]', 'ENV is development, detector will not send request.')
                 return;
             }
@@ -304,7 +304,7 @@ export type logType = (message?: any, ...optionalParams: any[]) => string;
 
 export const log: logType = (...args) => {
     const actionKey = args.join('');
-    if (ENV === 'production') {
+    if ((typeof ENV === 'string' && ENV === 'production') || (typeof ENV === 'boolean' && ENV)) {
         const strArgs = (args || []).join('\n ');
         sendActionLog(strArgs, actionKey);
     }
