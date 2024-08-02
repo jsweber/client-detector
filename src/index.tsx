@@ -6,7 +6,7 @@ const serviceHost = 'https://openxlab.org.cn/gw/data-bury'; // 服务请求地�
 const serviceName = 'test-service'; // 必须唯一，找管理员查询
 init(serviceHost, {
   serviceName
-});
+}, 'development');
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <App />,

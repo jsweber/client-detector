@@ -13,6 +13,10 @@ import {
     getGPU
 } from './utils';
 
+export type ENVType = 'production' | 'development';
+
+export let ENV: ENVType = 'production';
+
 export interface IClientDetector {
     userId?: string;
     send: () => Promise<any>;
@@ -179,6 +183,10 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
         userId,
         serviceHost,
         async send<T = any>(eventName: string, data: T) {
+            if (ENV === 'development') {
+                // console.log('[ClientDetector info]', 'ENV is development, detector will not send request.')
+                return;
+            }
             if (!serviceHost) {
                 console.error('[ClientDetector error]', 'serviceHost is empty, please init first!');
                 return;
@@ -274,10 +282,6 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
 export let detector: Detector = createClientDetector('', {
     serviceName: ''
 });
-
-export type ENVType = 'production' | 'development';
-
-export let ENV: ENVType = 'production';
 
 export const init = (serviceHost: string, param: ClientDetectorGlobalParam, env: ENVType = 'production') => {
     detector = createClientDetector(serviceHost, param);
