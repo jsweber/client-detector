@@ -2,6 +2,7 @@ import { FC, ReactNode, useEffect } from 'react';
 import { detector, log } from '../../lib';
 import ErrorBoundary from '../error-boundary';
 import ErrorDemo from '../error-demo'
+import ConsoleDemo from '../console-demo';
 import styles from './navigator-demo.module.less';
 
 export interface NavigatorDemoProps {
@@ -27,6 +28,7 @@ const NavigatorDemo: FC<NavigatorDemoProps> = () => {
             <div className={styles.navigatorDemo}>
                 请求发送测试页面
                 <button onClick={handleClick}>点击</button>
+                <ConsoleDemo />
             </div>
             <ErrorDemo />
         </ErrorBoundary>

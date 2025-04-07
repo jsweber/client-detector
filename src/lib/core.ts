@@ -1,33 +1,22 @@
-import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { collect } from './api';
 import { EventNameEnums } from './enums';
+import type {
+    ENVType,
+    ClientDetectorGlobalParam,
+    Detector,
+    DeviceInfo,
+    ErrorInfo,
+    ActionInfo,
+    logType
+} from './types';
 import {
     createTimestamp,
-    getBrowserVersion,
-    getBrowserName,
-    getOSInfo,
-    getScreenSize,
-    getWindowSize,
-    isMobile,
-    isWeChart,
-    getGPU
+    DefaultUserId,
+    getCachedUserId,
+    getClientInfo,
 } from './utils';
 
-export type ENVType = 'production' | 'development' | true | false;
-
 export let ENV: ENVType = 'production';
-
-export interface IClientDetector {
-    userId?: string;
-    send: () => Promise<any>;
-    setUserId: (userId: string) => any;
-}
-
-export interface ClientDetectorGlobalParam {
-    serviceName: string; // 
-    userId?: string;
-    buryId?: string;
-}
 
 export const createCollectInfo = <T>({
     serviceName,
@@ -57,120 +46,6 @@ export const createCollectInfo = <T>({
 
     return param;
 }
-
-export interface DeviceInfo {
-    os: string;
-    osVersion: string;
-    browserName: string;
-    browserVersion: string;
-    isMobile: boolean;
-    screenSizeWidth: number;
-    screenSizeHeight: number;
-    windowSizeWidth: number;
-    windowSizeHeight: number;
-    userAgent: string;
-    platform: string;
-    language: string;
-    isWeChart: boolean;
-    gpu: string;
-    // 1.2.0 add
-    printWater: string;
-    // 1.3.0 add
-    executeTimestamp: string;
-    performanceNow: string;
-    location: string;
-}
-
-export type ErrorInfo = DeviceInfo | {
-    errorName: string;
-    errorMessage: string;
-    errorLevel: number;
-    errorStack: string;
-    errorComponentStack: string;
-    actionKey: string;
-}
-
-export type ActionInfo = DeviceInfo | {
-    log: string;
-    actionKey: string;
-}
-
-export const DefaultUserId = 'visitor';
-
-export const getFingerprint = async (): Promise<string> => {
-    let id = DefaultUserId;
-    try {
-        const fpPromise = FingerprintJS.load();
-        const fp = await fpPromise;
-        const result = await fp.get();
-        id = result.visitorId;
-    } catch (err) {
-        console.warn('[ClientDetector warn]', err);
-    } finally {
-        return id;
-    }
-}
-
-export const getCachedUserId = async (): Promise<string> => {
-    const localKey = '__client_detector_local_key__';
-    let id = localStorage.getItem(localKey);
-
-    if (!id) {
-        id = await getFingerprint();
-        localStorage.setItem(localKey, id);
-    }
-
-    return id;
-}
-
-const getClientInfo = async (): Promise<DeviceInfo> => {
-    const { name: os, version: osVersion } = getOSInfo();
-    const screenSize = getScreenSize();
-    const windowSize = getWindowSize();
-    const printWater = await getCachedUserId();
-    const performanceNow = performance ? performance.now() : Date.now();
-    const info = {
-        os,
-        osVersion,
-        browserName: getBrowserName(),
-        browserVersion: getBrowserVersion(),
-        isMobile: isMobile(),
-        screenSizeWidth: screenSize.width,
-        screenSizeHeight: screenSize.height,
-        windowSizeWidth: windowSize.width,
-        windowSizeHeight: windowSize.height,
-        userAgent: navigator.userAgent.toLowerCase(),
-        platform: navigator.platform,
-        language: navigator.language,
-        isWeChart: isWeChart(),
-        gpu: getGPU(),
-        // 1.2.0 add
-        printWater,
-        // 1.3.0 add
-        executeTimestamp: (Date.now()).toString(),
-        performanceNow: performanceNow.toString(),
-        location: window.location.href
-    }
-
-    return info;
-}
-
-type SendErrorType = (error: Error | string, errorComponentStack?: string) => Promise<void>;
-export interface Detector {
-    userId: string | undefined;
-    serviceHost: string;
-    send: <T>(eventName: string, data: T) => Promise<void>;
-    setUserId: (userId: string) => void;
-    setFingerprint: () => Promise<void>;
-    sendClientInfo: () => Promise<void>;
-    sendError: (error: Error | string, errorComponentStack: string, level: number) => Promise<void>;
-    sendError0: SendErrorType;
-    sendError1: SendErrorType;
-    sendError2: SendErrorType;
-    sendError3: SendErrorType;
-    sendAction: (log: string, actionKey: string) => Promise<void>;
-}
-
 
 export const createClientDetector = (serviceHost: string, param: ClientDetectorGlobalParam): Detector => {
     const {
@@ -299,8 +174,6 @@ export const sendActionLog = async (log: string, actionKey: string, isSend: bool
         console.error(`[ClientDetector error]: detector is ${detector}`);
     }
 }
-
-export type logType = (message?: any, ...optionalParams: any[]) => string;
 
 export const log: logType = (...args) => {
     const actionKey = args.join('');

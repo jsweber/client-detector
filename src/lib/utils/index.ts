@@ -1,3 +1,6 @@
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import type { DeviceInfo } from '../types';
+
 export const DefaultText = 'Unknown';
 
 export const createTimestamp = (): string => {
@@ -183,4 +186,64 @@ export const getGPU = (): string => {
     } finally {
         return GPUInfo;
     }
+}
+
+export const DefaultUserId = 'visitor';
+
+export const getFingerprint = async (): Promise<string> => {
+    let id = DefaultUserId;
+    try {
+        const fpPromise = FingerprintJS.load();
+        const fp = await fpPromise;
+        const result = await fp.get();
+        id = result.visitorId;
+    } catch (err) {
+        console.warn('[ClientDetector warn]', err);
+    } finally {
+        return id;
+    }
+}
+
+export const getCachedUserId = async (): Promise<string> => {
+    const localKey = '__client_detector_local_key__';
+    let id = localStorage.getItem(localKey);
+
+    if (!id) {
+        id = await getFingerprint();
+        localStorage.setItem(localKey, id);
+    }
+
+    return id;
+}
+
+export const getClientInfo = async (): Promise<DeviceInfo> => {
+    const { name: os, version: osVersion } = getOSInfo();
+    const screenSize = getScreenSize();
+    const windowSize = getWindowSize();
+    const printWater = await getCachedUserId();
+    const performanceNow = performance ? performance.now() : Date.now();
+    const info = {
+        os,
+        osVersion,
+        browserName: getBrowserName(),
+        browserVersion: getBrowserVersion(),
+        isMobile: isMobile(),
+        screenSizeWidth: screenSize.width,
+        screenSizeHeight: screenSize.height,
+        windowSizeWidth: windowSize.width,
+        windowSizeHeight: windowSize.height,
+        userAgent: navigator.userAgent.toLowerCase(),
+        platform: navigator.platform,
+        language: navigator.language,
+        isWeChart: isWeChart(),
+        gpu: getGPU(),
+        // 1.2.0 add
+        printWater,
+        // 1.3.0 add
+        executeTimestamp: (Date.now()).toString(),
+        performanceNow: performanceNow.toString(),
+        location: window.location.href
+    }
+
+    return info;
 }
