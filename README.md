@@ -483,8 +483,89 @@ export default App;
 
 ```
 
-### 单例模式发送错误
+## Console 日志搜集
 
+从 1.4.0 版本开始，SDK 提供了 console 日志搜集功能。在生产环境下，会自动拦截并搜集 console.info 和 console.error 的日志信息，并批量发送到服务器。
+
+### 功能特点
+
+1. 自动搜集 - 在初始化时自动启用（可选关闭）
+2. 批量处理 - 日志会被缓存并批量发送，减少请求次数
+3. 智能队列 - 使用 requestIdleCallback 在浏览器空闲时发送，不影响主线程
+4. 设备信息 - 每批日志会自动附带设备信息，方便追踪问题
+
+### 配置方式
+
+```js
+import { init } from '@easycode/client-detector';
+
+// 默认开启 console 功能
+init(serviceHost, { 
+    serviceName: 'your-service' 
+});
+
+// 禁用 console 功能
+init(serviceHost, { 
+    serviceName: 'your-service' 
+}, 'production', false);
+```
+
+### 日志格式
+
+发送到服务器的日志格式如下：
+
+```typescript
+{
+    // 日志信息
+    consoleLogs: [{
+        level: 'info' | 'error',  // 日志级别
+        message: string,          // 日志内容
+        timestamp: number         // 时间戳
+    }],
+    
+    // 设备信息（自动附加）
+    os: string,                  // 操作系统
+    browserName: string,         // 浏览器名称
+    browserVersion: string,      // 浏览器版本
+    // ... 其他设备信息
+}
+```
+
+### 使用示例
+
+```js
+// 记录普通信息
+console.info('用户点击了按钮', { 
+    buttonId: 'submit',
+    timestamp: Date.now() 
+});
+
+// 记录错误信息
+console.error('API 请求失败', new Error('Network Error'), { 
+    url: '/api/data',
+    status: 500 
+});
+
+// 支持多种数据类型
+console.info(
+    '复杂数据', 
+    { obj: { id: 1 } },
+    [1, 2, 3],
+    null,
+    undefined
+);
+```
+
+### 注意事项
+
+1. 只在生产环境（production）下生效
+2. 开发环境下使用原始的 console 方法
+3. 日志会在以下情况触发发送：
+   - 累积到 10 条消息
+   - 距离上次发送超过 5 秒
+   - 浏览器空闲时
+4. 所有原始日志仍然会在控制台显示
+5. 如果发送失败，日志会重新加入队列等待下次发送
 
 
 <br/>
