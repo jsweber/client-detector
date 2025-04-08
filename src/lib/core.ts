@@ -15,8 +15,8 @@ import {
     getCachedUserId,
     getClientInfo,
 } from './utils';
-
-export let ENV: ENVType = 'production';
+import { setENV, isDev, isProd } from './config';
+import { overwriteConsole } from './console';
 
 export const createCollectInfo = <T>({
     serviceName,
@@ -58,7 +58,7 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
         userId,
         serviceHost,
         async send<T = any>(eventName: string, data: T) {
-            if ((typeof ENV === 'string' && ENV !== 'production') || (typeof ENV === 'boolean' && !ENV)) {
+            if (isDev()) {
                 // console.log('[ClientDetector info]', 'ENV is development, detector will not send request.')
                 return;
             }
@@ -158,9 +158,12 @@ export let detector: Detector = createClientDetector('', {
     serviceName: ''
 });
 
-export const init = (serviceHost: string, param: ClientDetectorGlobalParam, env: ENVType = 'production') => {
+export const init = (serviceHost: string, param: ClientDetectorGlobalParam, env: ENVType = 'production', isOverwriteConsole: boolean = true) => {
     detector = createClientDetector(serviceHost, param);
-    ENV = env;
+    setENV(env);
+    if (env === 'production' || env === true) {
+        overwriteConsole(isOverwriteConsole);
+    }
 }
 
 export const get = (): Detector => {
@@ -177,7 +180,7 @@ export const sendActionLog = async (log: string, actionKey: string, isSend: bool
 
 export const log: logType = (...args) => {
     const actionKey = args.join('');
-    if ((typeof ENV === 'string' && ENV === 'production') || (typeof ENV === 'boolean' && ENV)) {
+    if (isProd()) {
         const strArgs = (args || []).join('\n ');
         sendActionLog(strArgs, actionKey);
     }

@@ -1,4 +1,5 @@
-import { ENV, get } from '../core';
+import { get } from '../core';
+import { isDev } from '../config';
 import { getClientInfo } from '../utils';
 import { EventNameEnums } from '../enums';
 
@@ -6,7 +7,6 @@ interface QueueItem {
     level: 'info' | 'error';
     message: string;
     timestamp: number;
-    clientInfo?: any;
 }
 
 class ConsoleQueue {
@@ -31,14 +31,7 @@ class ConsoleQueue {
 
     public async add(item: QueueItem) {
         try {
-            if (!this.cachedClientInfo) {
-                await this.initClientInfo();
-            }
-            
-            this.queue.push({
-                ...item,
-                clientInfo: this.cachedClientInfo
-            });
+            this.queue.push(item);
             this.scheduleProcess();
         } catch (error) {
             originalConsole.error('[ClientDetector queue add error]', error);
@@ -76,13 +69,19 @@ class ConsoleQueue {
                 }
 
                 try {
+                    if (!this.cachedClientInfo) {
+                        await this.initClientInfo();
+                    }
+
+                    const clientInfo = this.cachedClientInfo || {};
+
                     await detector.send(EventNameEnums.collectConsoleInfo, {
-                        logs: batch.map(item => ({
+                        consoleLogs: batch.map(item => ({
                             level: item.level,
                             message: item.message,
-                            timestamp: item.timestamp,
-                            clientInfo: item.clientInfo
-                        }))
+                            timestamp: item.timestamp
+                        })),
+                        ...clientInfo
                     });
                 } catch (error) {
                     this.queue.unshift(...batch);
@@ -135,9 +134,7 @@ function createEnhancedConsole() {
     return {
         info: function(...args: any[]) {
             try {
-                if ((typeof ENV === 'string' && ENV !== 'production') || 
-                    (typeof ENV === 'boolean' && !ENV) || 
-                    typeof window === 'undefined') {
+                if (isDev() || typeof window === 'undefined') {
                     return originalConsole.info(...args);
                 }
 
@@ -156,9 +153,7 @@ function createEnhancedConsole() {
 
         error: function(...args: any[]) {
             try {
-                if ((typeof ENV === 'string' && ENV !== 'production') || 
-                    (typeof ENV === 'boolean' && !ENV) || 
-                    typeof window === 'undefined') {
+                if (isDev() || typeof window === 'undefined') {
                     return originalConsole.error(...args);
                 }
 
@@ -177,8 +172,9 @@ function createEnhancedConsole() {
     };
 }
 
-export function overwriteConsole() {
+export function overwriteConsole(isOverwrite: boolean = true) {
     try {
+        if (!isOverwrite) return;
         const enhancedConsole = createEnhancedConsole();
         console.info = enhancedConsole.info;
         console.error = enhancedConsole.error;
