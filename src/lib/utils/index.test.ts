@@ -1,3 +1,4 @@
+// @ts-nocheck
 vi.mock('../utils', async () => {
     // 导入原始模块
     const actual = await vi.importActual('../utils');
