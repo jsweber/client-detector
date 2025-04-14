@@ -247,3 +247,30 @@ export const getClientInfo = async (): Promise<DeviceInfo> => {
 
     return info;
 }
+
+/**
+ * 获取请求的url
+ * @param obj AxiosError | AxiosResponse
+ * @returns api url
+ */
+export const getRequestUrl = (obj: any): string => {
+    try {
+        return obj?.request?.responseURL || obj?.config?.url || obj?.config?.baseURL || 'unknown api';
+    } catch (error) {
+        return 'unknown api';
+    }
+}
+
+/**
+ * 截断过长的字符串
+ * @param str 原始字符串
+ * @param maxLength 最大长度
+ * @returns 截断后的字符串
+ */
+export const truncateString = (str: string, maxLength: number = 2000): string => {
+    if (!str || str.length <= maxLength) return str;
+    
+    // 保留前半部分和后半部分，中间用省略号代替
+    const halfLength = Math.floor(maxLength / 2) - 15;
+    return `${str.substring(0, halfLength)}...truncated ${str.length - maxLength} chars...${str.substring(str.length - halfLength)}`;
+};

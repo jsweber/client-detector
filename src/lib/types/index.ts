@@ -60,11 +60,11 @@ interface Detector {
     setUserId: (userId: string) => void;
     setFingerprint: () => Promise<void>;
     sendClientInfo: () => Promise<void>;
-    sendError: (error: Error | string, errorComponentStack: string, level: number) => Promise<void>;
-    sendError0: SendErrorType;
-    sendError1: SendErrorType;
-    sendError2: SendErrorType;
-    sendError3: SendErrorType;
+    sendError: (error: Error | string, errorComponentStack?: string, level?: number, maxLength?: number) => Promise<void>;
+    sendError0: (error: Error | string, errorComponentStack?: string, maxLength?: number) => Promise<void>;
+    sendError1: (error: Error | string, errorComponentStack?: string, maxLength?: number) => Promise<void>;
+    sendError2: (error: Error | string, errorComponentStack?: string, maxLength?: number) => Promise<void>;
+    sendError3: (error: Error | string, errorComponentStack?: string, maxLength?: number) => Promise<void>;
     sendAction: (log: string, actionKey: string) => Promise<void>;
 }
 
