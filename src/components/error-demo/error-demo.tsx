@@ -8,7 +8,55 @@ export interface ErrorDemoProps {
 const ErrorDemo: FC<ErrorDemoProps> = () => {
 
     useEffect(() => {
-        // throw new TypeError('error message');
+        throw new TypeError(`
+
+nd a mutation. The method name is different, and the way that the client will use this procedure changes - but everything else is the same!
+
+Let's add a userCreate mutation by adding it as a new property on our router object:Similar to GraphQL, tRPC makes a distinction between query and mutation procedures.
+
+The way a procedure works on the server doesn't change much between a query and a mutation. The method name is different, and the way that the client will use this procedure changes - but everything else is the same!
+
+Let's add a userCreate mutation by adding it as a new property on our router object:Similar to GraphQL, tRPC makes a distinction between query and mutation procedures.
+
+The way a procedure works on the server doesn't change much between a query and a mutation. The method name is different, and the way that the client will use this procedure changes - but everything else is the same!
+
+Let's add a userCreate mutation by adding it as a new property on our router object:Similar to GraphQL, tRPC makes a distinction between query and mutation procedures.
+
+The way a procedure works on the server doesn't change much between a query and a mutation. The method name is different, and the way that the client will use this procedure changes - but everything else is the same!
+
+Let's add a userCreate mutation by adding it as a new property on our router object:Similar to GraphQL, tRPC makes a distinction between query and mutation procedures.
+
+The way a procedure works on the server doesn't change much between a query and a mutation. The method name is different, and the way that the client will use this procedure changes - but everything else is the same!
+
+Let's add a userCreate mutation by adding it as a new property on our router object:Similar to GraphQL, tRPC makes a distinction between query and mutation procedures.
+
+The way a procedure works on the server doesn't change much between a query and a mutation. The method name is different, and the way that the client will use this procedure changes - but everything else is the same!
+
+Let's add a userCreate mutation by adding it as a new property on our router object:Similar to GraphQL, tRPC makes a distinction between query and mutation procedures.
+
+The way a procedure works on the server doesn't change much between a query and a mutation. The method name is different, and the way that the client will use this procedure changes - but everything else is the same!
+
+Let's add a userCreate mutation by adding it as a new property on our router object:Similar to GraphQL, tRPC makes a distinction between query and mutation procedures.
+
+The way a procedure works on the server doesn't change much between a query and a mutation. The method name is different, and the way that the client will use this procedure changes - but everything else is the same!
+
+Let's add a userCreate mutation by adding it as a new property on our router object:Similar to GraphQL, tRPC makes a distinction between query and mutation procedures.
+
+The way a procedure works on the server doesn't change much between a query and a mutation. The method name is different, and the way that the client will use this procedure changes - but everything else is the same!
+
+Let's add a userCreate mutation by adding it as a new property on our router object:Similar to GraphQL, tRPC makes a distinction between query and mutation procedures.
+
+The way a procedure works on the server doesn't change much between a query and a mutation. The method name is different, and the way that the client will use this procedure changes - but everything else is the same!
+
+Let's add a userCreate mutation by adding it as a new property on our router object:Similar to GraphQL, tRPC makes a distinction between query and mutation procedures.
+
+The way a procedure works on the server doesn't change much between a query and a mutation. The method name is different, and the way that the client will use this procedure changes - but everything else is the same!
+
+Let's add a userCreate mutation by adding it as a new property on our router object:Similar to GraphQL, tRPC makes a distinction between query and mutation procedures.
+
+The way a procedure works on the server doesn't change much between a query and a mutation. The method name is different, and the way that the client will use this procedure changes - but everything else is the same!
+
+Let's add a userCreate mutation by adding it as a new property on our router object:`);
     }, []);
 
     return (

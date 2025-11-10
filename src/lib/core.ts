@@ -20,7 +20,7 @@ import { setENV, isDev, isProd } from './config';
 import { overwriteConsole } from './console';
 
 // 添加一个常量定义错误堆栈的最大长度
-export const DEFAULT_ERROR_STACK_MAX_LENGTH = 2000;
+export const DEFAULT_ERROR_STACK_MAX_LENGTH = 1000;
 
 export const createCollectInfo = <T>({
     serviceName,
@@ -61,7 +61,7 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
     const ClientDetector: Detector = {
         userId,
         serviceHost,
-        async send<T = any>(eventName: string, data: T) {
+        async send<T = unknown>(eventName: string, data: T) {
             if (isDev()) {
                 // console.log('[ClientDetector info]', 'ENV is development, detector will not send request.')
                 return;
@@ -151,32 +151,35 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
                     }
                 }
                 // 如果总长度未超出，则保持原样
+                // 单独处理error.message,
+                const errorMessageLen = error.message.length
+                const errorMessage = errorMessageLen > halfMaxLength ? `${error.message.slice(0, 350)}......${error.message.slice(errorMessageLen - 100, errorMessageLen)}` : error.message;
                 
                 const info = {
                     ...clientInfo,
                     errorName: error.name,
-                    errorMessage: error.message,
+                    errorMessage: errorMessage,
                     errorLevel: level,
                     errorStack: truncatedErrorStack,
                     errorComponentStack: truncatedComponentStack
                 };
-                ClientDetector.send<ErrorInfo>(EventNameEnums.collectErrorInfo, info);
+                await ClientDetector.send<ErrorInfo>(EventNameEnums.collectErrorInfo, info);
             } catch (err) {
                 console.warn('[ClientDetector warn]', err);
             }
         },
 
         async sendError0(error: Error | string, errorComponentStack = '', maxLength = DEFAULT_ERROR_STACK_MAX_LENGTH) {
-            ClientDetector.sendError(error, errorComponentStack, 0, maxLength);
+            await ClientDetector.sendError(error, errorComponentStack, 0, maxLength);
         },
         async sendError1(error: Error | string, errorComponentStack = '', maxLength = DEFAULT_ERROR_STACK_MAX_LENGTH) {
-            ClientDetector.sendError(error, errorComponentStack, 1, maxLength);
+            await ClientDetector.sendError(error, errorComponentStack, 1, maxLength);
         },
         async sendError2(error: Error | string, errorComponentStack = '', maxLength = DEFAULT_ERROR_STACK_MAX_LENGTH) {
-            ClientDetector.sendError(error, errorComponentStack, 2, maxLength);
+            await ClientDetector.sendError(error, errorComponentStack, 2, maxLength);
         },
         async sendError3(error: Error | string, errorComponentStack = '', maxLength = DEFAULT_ERROR_STACK_MAX_LENGTH) {
-            ClientDetector.sendError(error, errorComponentStack, 3, maxLength);
+            await ClientDetector.sendError(error, errorComponentStack, 3, maxLength);
         },
 
         async sendAction(log: string, actionKey: string) {
@@ -187,7 +190,7 @@ export const createClientDetector = (serviceHost: string, param: ClientDetectorG
                     log,
                     actionKey
                 };
-                ClientDetector.send<ActionInfo>(EventNameEnums.collectActionLogInfo, info);
+                await ClientDetector.send<ActionInfo>(EventNameEnums.collectActionLogInfo, info);
             } catch (err) {
                 console.warn('[ClientDetector warn]', err);
             }
