@@ -15,7 +15,7 @@ class ConsoleQueue {
     private readonly maxBatchSize = 10;
     private readonly maxWaitTime = 5000; // 5秒
     private lastProcessTime = Date.now();
-    private cachedClientInfo: any = null;
+    private cachedClientInfo: unknown = null;
 
     constructor() {
         this.initClientInfo();
@@ -105,7 +105,7 @@ class ConsoleQueue {
 
 const queue = new ConsoleQueue();
 
-function formatArgs(...args: any[]): string {
+function formatArgs(...args: unknown[]): string {
     try {
         return args.map(arg => {
             if (arg === null) return 'null';
@@ -132,7 +132,7 @@ const originalConsole = {
 
 function createEnhancedConsole() {
     return {
-        info: function(...args: any[]) {
+        info: function(...args: unknown[]) {
             try {
                 if (isDev() || typeof window === 'undefined') {
                     return originalConsole.info(...args);
@@ -151,7 +151,7 @@ function createEnhancedConsole() {
             }
         },
 
-        error: function(...args: any[]) {
+        error: function(...args: unknown[]) {
             try {
                 if (isDev() || typeof window === 'undefined') {
                     return originalConsole.error(...args);
